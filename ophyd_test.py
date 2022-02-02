@@ -1,4 +1,4 @@
-import test as smarPodHandler
+from smarpod_test import SmarPod
 
 from ophyd.utils import make_dir_tree
 import datetime
@@ -10,24 +10,22 @@ from ophyd import Component as Cpt
 from ophyd.sim import NullStatus, new_uid
 import numpy as np
 from pathlib import Path
-import time
-
-
+import asyncio
 
 
 class SmarPodFileHandler:
-    spec = {'smarpod'}
+    spec = {"smarpod"}
 
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self._name = filename
 
     def __call__(self):
         return np.load(self._name)
 
 
-_ = make_dir_tree(datetime.datetime.now().year, base_path='/tmp/data')
+_ = make_dir_tree(datetime.datetime.now().year, base_path="/tmp/data")
 db = Broker.from_config(temp())
-db.reg.register_handler('smarpod', SmarPodFileHandler, overwrite=True)
+db.reg.register_handler("smarpod", SmarPodFileHandler, overwrite=True)
 
 RE = RunEngine({})
 token = RE.subscribe(db.insert)
@@ -37,24 +35,33 @@ class SmarPod(Device):
     movement = Cpt(Signal)
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, position, **kwargs)
         self.numpy_file = None
         self.resource_id = None
-        
+        self.initial_position_data = position
+        self.final_position = None
 
-    def trigger(self):
+    async def trigger(self):
         super().trigger()
 
         datum_id = new_uid()
         date = datetime.datetime.now()
-        self.numpy_file = Path('/tmp/data') / Path(date.strftime('%Y/%m/%d')) / \
-                          Path('{}.npy'.format(datum_id))
-        time.sleep(1)
+        self.numpy_file = Path(
+            "/tmp/data/{}/{}.npy".format(date.strftime("%Y/%m/%d"), datum_id)
+        )
+        await asyncio.sleep(1)
+
+        smarpod_object = SmarPod(self.initial_position_data)
+        handle = smarpod_object.set_up()
+        self.final_position = smarpod_object.moving(self.initial_position_data)
+        smarpod_object.tear_down(handle)
+
+        np.save(self._npy_file, self.final_position)
+
         self.movement.put(datum_id)
 
-        self.resource_id = db.reg.insert_resource('smarpod', self.numpy_file, {})
+        self.resource_id = db.reg.insert_resource("smarpod", self.numpy_file, {})
         db.reg.insert_datum(self.resource_id, datum_id, {})
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         return NullStatus()
-
