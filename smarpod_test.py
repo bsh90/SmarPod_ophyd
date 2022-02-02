@@ -147,29 +147,3 @@ class SmarPod:
         pose = smarpod.GetPose(self.handle)
         logging.info("pose = %s" % self.pose_to_str(pose))
         return pose
-
-
-def load_position_data_sample():
-    pose_Home = Pose(0, 0, 0, 0, 0, 0)
-    pose_sequence = [
-        pose_Home,
-        Pose(0, 0, 0.002, 0, 0, 0),
-        Pose(0, 0, -0.002, 0, 0, 0),
-        Pose(-0.002, 0, 0, 0, 0, 0),
-        Pose(-0.002, -0.002, 0, 0, 0, 0),
-        Pose(0.002, 0.002, 0, 0, 0, 0),
-        Pose(0, 0, 0, 0, 0, -5),
-        Pose(0, 0, 0, -0.02, 0, 5),
-        pose_Home,
-    ]
-    return pose_sequence
-
-
-pose_seq = load_position_data_sample()
-
-smarpod_object = SmarPod(pose_seq)
-handle = smarpod_object.set_up()
-
-get_pose = smarpod_object.moving(pose_seq)
-
-smarpod_object.tear_down(handle)
