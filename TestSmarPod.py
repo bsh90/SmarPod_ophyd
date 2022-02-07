@@ -1,4 +1,5 @@
 from smarpod_test import SmarPod
+from ophyd_test import SmarPod_ophyd
 import unittest
 
 
@@ -27,6 +28,14 @@ class TestSmarPod(unittest.TestCase):
         get_pose = smarpod_object.moving(pose_seq)
 
         smarpod_object.tear_down(handle)
+
+        self.assertEqual(get_pose, pose_seq)
+
+    def test_happyPath_ophyd(self):
+        pose_seq = self.load_position_data_sample()
+
+        ophyd_object = SmarPod_ophyd('sth', name="sth1", position=pose_seq)
+        get_pose = ophyd_object.set_positions()
 
         self.assertEqual(get_pose, pose_seq)
 
