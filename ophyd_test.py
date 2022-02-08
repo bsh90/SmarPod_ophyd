@@ -6,17 +6,14 @@ import asyncio
 
 
 class SmarPod_ophyd(Device):
-    movement = Cpt(Signal)
+    positions = Cpt(Signal)
 
-    def __init__(self, *args, position, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.initial_position_data = position
-        self.final_position = None
-
-    def set_positions(self):
-        smarpod_object = SmarPod(self.initial_position_data)
+    def set_and_get_positions(self, initial_position):
+        smarpod_object = SmarPod()
         handle = smarpod_object.set_up()
-        self.final_position = smarpod_object.moving(self.initial_position_data)
+
+        self.positions.set(smarpod_object.moving(initial_position)).wait()
+
         smarpod_object.tear_down(handle)
 
-        return self.final_position
+        return print(self.positions.get())

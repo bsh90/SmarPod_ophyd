@@ -15,9 +15,8 @@ class SmarPod:
         level=logging.DEBUG,
     )
 
-    def __init__(self, pose_sequence):
+    def __init__(self):
         self.handle = None
-        self.pose_sequence = pose_sequence
 
     def check_lib_compatibility(self):
         # Check Python API major version number vs loaded shared library.
@@ -139,10 +138,10 @@ class SmarPod:
             print("moving to %s" % self.pose_to_str(pose))
             smarpod.Move(self.handle, pose, 0, True)
 
-    def moving(self):
-        if not self.check_pose_list(self.pose_sequence):
+    def moving(self, pose_sequence):
+        if not self.check_pose_list(pose_sequence):
             raise Exception("not all poses in sequence are reachable")
-        self.move_sequence(self.pose_sequence)
+        self.move_sequence(pose_sequence)
 
         pose = smarpod.GetPose(self.handle)
         logging.info("pose = %s" % self.pose_to_str(pose))

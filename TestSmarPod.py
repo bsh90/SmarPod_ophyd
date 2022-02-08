@@ -22,7 +22,7 @@ class TestSmarPod(unittest.TestCase):
     def test_happyPath(self):
         pose_seq = self.load_position_data_sample()
 
-        smarpod_object = SmarPod(pose_seq)
+        smarpod_object = SmarPod()
         handle = smarpod_object.set_up()
 
         get_pose = smarpod_object.moving(pose_seq)
@@ -34,8 +34,8 @@ class TestSmarPod(unittest.TestCase):
     def test_happyPath_ophyd(self):
         pose_seq = self.load_position_data_sample()
 
-        ophyd_object = SmarPod_ophyd('sth', name="sth1", position=pose_seq)
-        get_pose = ophyd_object.set_positions()
+        ophyd_object = SmarPod_ophyd("sth", name="sth1")
+        get_pose = ophyd_object.set_and_get_positions(pose_seq)
 
         self.assertEqual(get_pose, pose_seq)
 
