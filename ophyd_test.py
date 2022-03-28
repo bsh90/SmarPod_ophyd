@@ -12,7 +12,7 @@ class SmarPod_ophyd(Device):
         handle = smarpod_object.set_up()
 
         final_pose = smarpod_object.moving(handle, initial_position)
-        self.positions.set(smarpod_object.pose_to_str(final_pose)).wait()
+        self.positions.set(smarpod_object.pose_to_double_list(final_pose)).wait()
 
         smarpod_object.tear_down(handle)
 

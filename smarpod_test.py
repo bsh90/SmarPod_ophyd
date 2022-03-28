@@ -42,6 +42,16 @@ class SmarPod:
             pose.rotationZ,
         )
 
+    def pose_to_double_list(self, pose):
+        pose_list = []
+        pose_list.append(pose.positionX)
+        pose_list.append(pose.positionY)
+        pose_list.append(pose.positionZ)
+        pose_list.append(pose.rotationX)
+        pose_list.append(pose.rotationY)
+        pose_list.append(pose.rotationZ)
+        return pose_list
+
     def set_speed_and_frequency_and_pivot_point_and_coordinate_system(self):
         smarpod.SetSpeed(self.handle, 1, 3e-3)
         smarpod.SetMaxFrequency(self.handle, 18500)

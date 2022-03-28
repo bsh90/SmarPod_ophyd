@@ -38,10 +38,10 @@ class TestSmarPod(unittest.TestCase):
         pose_seq = self.load_position_data_sample()
 
         ophyd_object = SmarPod_ophyd("sth", name="sth1")
-        final_pose_zero = ophyd_object.set_and_get_positions(pose_seq)
+        final_pose_zero_in_double_list = ophyd_object.set_and_get_positions(pose_seq)
 
 #        self.assertEqual(get_pose, pose_seq)
-        print(final_pose_zero)
+        print(final_pose_zero_in_double_list)
 
 
 if __name__ == "__main__":
