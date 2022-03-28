@@ -1,22 +1,21 @@
 import smaract.smarpod as smarpod
 from smaract.smarpod import Pose as Pose
 import logging
-import asyncio
 
 
 class SmarPod:
 
     model = 10052
     locator = "usb:sn:MCS2-00006657"
-    logging.basicConfig(
-        filename="smarpodAPI.log",
-        filemode="w",
-        format="%(name)s - %(levelname)s - %(message)s",
-        level=logging.DEBUG,
-    )
 
     def __init__(self):
         self.handle = None
+        logging.basicConfig(
+            filename="smarpodAPI.log",
+            filemode="w",
+            format="%(name)s - %(levelname)s - %(message)s",
+            level=logging.DEBUG,
+        )
 
     def check_lib_compatibility(self):
         # Check Python API major version number vs loaded shared library.
@@ -58,12 +57,12 @@ class SmarPod:
             "setting coordinate system to %s" % self.pose_to_str(coordinate_sys)
         )
 
-    async def set_up(self):
+    def set_up(self):
         try:
             self.check_lib_compatibility()
             self.log_controllers()
 
-            self.handle = smarpod.Open(model, locator)
+            self.handle = smarpod.Open(self.model, self.locator)
             logging.info("Device opened successfully")
 
             frequency = 8000
@@ -95,7 +94,7 @@ class SmarPod:
                     "movement status = %s (%s). Operation will wait for 3 second."
                     % (smarpod.MoveStatus(mstat), move_status)
                 )
-                await asyncio.sleep(3)
+#                await asyncio.sleep(3)
             smarpod.Stop(self.handle)
             move_status = smarpod.GetMoveStatus(self.handle)
             if move_status == smarpod.MoveStatus.STOPPED:
@@ -111,6 +110,7 @@ class SmarPod:
                 raise Exception("It could not be stopped.")
 
             self.set_speed_and_frequency_and_pivot_point_and_coordinate_system()
+            return self.handle
 
         except (smarpod.Error, Exception) as err:
             error_message = "SMARPOD ERROR: %s -> %s - (%s)" % (
@@ -122,6 +122,7 @@ class SmarPod:
             print(error_message)
 
     def tear_down(self, smarpod_handle):
+        self.handle = smarpod_handle
         if smarpod_handle != None:
             smarpod.Close(smarpod_handle)
             logging.info("Device closed successfully")
@@ -138,7 +139,8 @@ class SmarPod:
             print("moving to %s" % self.pose_to_str(pose))
             smarpod.Move(self.handle, pose, 0, True)
 
-    def moving(self, pose_sequence):
+    def moving(self, smarpod_handle, pose_sequence):
+        self.handle = smarpod_handle
         if not self.check_pose_list(pose_sequence):
             raise Exception("not all poses in sequence are reachable")
         self.move_sequence(pose_sequence)

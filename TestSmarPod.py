@@ -1,3 +1,4 @@
+from smaract.smarpod import Pose as Pose
 from smarpod_test import SmarPod
 from ophyd_test import SmarPod_ophyd
 import unittest
@@ -25,19 +26,22 @@ class TestSmarPod(unittest.TestCase):
         smarpod_object = SmarPod()
         handle = smarpod_object.set_up()
 
-        get_pose = smarpod_object.moving(pose_seq)
+        get_pose = smarpod_object.moving(handle, pose_seq)
+        final_pose_zero = smarpod_object.pose_to_str(get_pose)
 
         smarpod_object.tear_down(handle)
 
-        self.assertEqual(get_pose, pose_seq)
+#        self.assertEqual(final_pose_zero, initial_pose_zero)
+        print(final_pose_zero)
 
     def test_happyPath_ophyd(self):
         pose_seq = self.load_position_data_sample()
 
         ophyd_object = SmarPod_ophyd("sth", name="sth1")
-        get_pose = ophyd_object.set_and_get_positions(pose_seq)
+        final_pose_zero = ophyd_object.set_and_get_positions(pose_seq)
 
-        self.assertEqual(get_pose, pose_seq)
+#        self.assertEqual(get_pose, pose_seq)
+        print(final_pose_zero)
 
 
 if __name__ == "__main__":

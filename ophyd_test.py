@@ -2,7 +2,6 @@ from smarpod_test import SmarPod
 
 from ophyd import Device, Signal
 from ophyd import Component as Cpt
-import asyncio
 
 
 class SmarPod_ophyd(Device):
@@ -12,8 +11,9 @@ class SmarPod_ophyd(Device):
         smarpod_object = SmarPod()
         handle = smarpod_object.set_up()
 
-        self.positions.set(smarpod_object.moving(initial_position)).wait()
+        final_pose = smarpod_object.moving(handle, initial_position)
+        self.positions.set(smarpod_object.pose_to_str(final_pose)).wait()
 
         smarpod_object.tear_down(handle)
 
-        return print(self.positions.get())
+        return self.positions.get()
