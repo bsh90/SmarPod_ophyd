@@ -114,7 +114,7 @@ class SmarPod:
                 )
             else:
                 logging.error(
-                    "Moving stopped. movement status = %s (%s). It could not be stopped."
+                    "Movement status = %s (%s). It could not be stopped."
                     % (smarpod.MoveStatus(move_status), move_status)
                 )
                 raise Exception("It could not be stopped.")

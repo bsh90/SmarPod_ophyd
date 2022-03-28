@@ -1,6 +1,6 @@
 from smaract.smarpod import Pose as Pose
 from smarpod_test import SmarPod
-from ophyd_test import SmarPod_ophyd
+from ophyd_test import SmarSignalRO, SmarSignal
 import unittest
 
 
@@ -20,28 +20,32 @@ class TestSmarPod(unittest.TestCase):
         ]
         return pose_sequence
 
-    def test_happyPath(self):
+#     def test_happyPath(self):
+#         pose_seq = self.load_position_data_sample()
+
+#         smarpod_object = SmarPod()
+#         handle = smarpod_object.set_up()
+
+#         get_pose = smarpod_object.moving(handle, pose_seq)
+#         final_pose_zero = smarpod_object.pose_to_str(get_pose)
+
+#         smarpod_object.tear_down(handle)
+
+# #        self.assertEqual(final_pose_zero, initial_pose_zero)
+#         print(final_pose_zero)
+
+    def test_happy_path_get_position(self):
+        with SmarSignalRO(name="sth1") as ophyd_object:
+            pose = ophyd_object.get()
+        print(pose)
+
+    def test_happy_path_set_position(self):
         pose_seq = self.load_position_data_sample()
 
-        smarpod_object = SmarPod()
-        handle = smarpod_object.set_up()
-
-        get_pose = smarpod_object.moving(handle, pose_seq)
-        final_pose_zero = smarpod_object.pose_to_str(get_pose)
-
-        smarpod_object.tear_down(handle)
-
-#        self.assertEqual(final_pose_zero, initial_pose_zero)
-        print(final_pose_zero)
-
-    def test_happyPath_ophyd(self):
-        pose_seq = self.load_position_data_sample()
-
-        ophyd_object = SmarPod_ophyd("sth", name="sth1")
-        final_pose_zero_in_double_list = ophyd_object.set_and_get_positions(pose_seq)
-
-#        self.assertEqual(get_pose, pose_seq)
-        print(final_pose_zero_in_double_list)
+        for pose in pose_seq:
+            with SmarSignal(name="sth1") as ophyd_object:
+                status = ophyd_object.set(pose)
+            print("done={0.done}, success={0.success}".format(status))
 
 
 if __name__ == "__main__":
