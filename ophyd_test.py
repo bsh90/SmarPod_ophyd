@@ -8,12 +8,15 @@ class SmarSignalRO(Signal):
     smarpod_object = None
     handle = None
 
-    def __enter__(self):
+    def __init__(self, name, optional_handle=None):
+        super().__init__(name=name)
         self.smarpod_object = SmarPod()
-        self.handle = self.smarpod_object.set_up()
-        return self
+        if optional_handle is not None:
+            self.handle = optional_handle
+        else:
+            self.handle = self.smarpod_object.set_up()
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def tear_down(self):
         self.smarpod_object.tear_down(self.handle)
 
     def get(self):
@@ -24,19 +27,18 @@ class SmarSignalRO(Signal):
 class SmarSignal(SmarSignalRO):
     status = None
 
-    def __enter__(self):
-        super().__enter__()
-        self.status = StatusBase(timeout=60)
-        return self
-
     def set(self, pose):
         self.verify_reachable_position(pose)
 
         print("moving to %s" % self.smarpod_object.pose_to_str(pose))
         smarpod.Move(self.handle, pose, 0, True)
 
+        self.status = StatusBase(timeout=60)
         self.verify_stopped_status()
-        return self.status
+        status_result = self.status
+        self.status = None
+
+        return status_result
 
     def get_status(self):
         move_status = smarpod.GetMoveStatus(self.handle)

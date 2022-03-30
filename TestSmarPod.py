@@ -35,17 +35,34 @@ class TestSmarPod(unittest.TestCase):
 #         print(final_pose_zero)
 
     def test_happy_path_get_position(self):
-        with SmarSignalRO(name="sth1") as ophyd_object:
-            pose = ophyd_object.get()
-        print(pose)
+        hexapod = SmarSignalRO(name="hexapod")
+        for i in range(10):
+            print(hexapod.get())
+        hexapod.tear_down()
 
     def test_happy_path_set_position(self):
         pose_seq = self.load_position_data_sample()
 
-        for pose in pose_seq:
-            with SmarSignal(name="sth1") as ophyd_object:
-                status = ophyd_object.set(pose)
+        hexapod = SmarSignal(name="hexapod")
+        for pose in pose_seq: 
+            status = hexapod.set(pose)
             print("done={0.done}, success={0.success}".format(status))
+        hexapod.tear_down()
+
+    def test_happy_path_get_and_set_with_same_handle(self):
+        hexapod_get = SmarSignalRO(name="hexapod_get")
+        print("Initial position is ", hexapod_get.get())
+
+        hexapod_set = SmarSignal(name="hexapod_set", 
+                                 optional_handle=hexapod_get.handle)
+        pose_seq = self.load_position_data_sample()
+        for pose in pose_seq: 
+            status = hexapod_set.set(pose)
+            print("done={0.done}, success={0.success}".format(status))
+
+        print("Last position is ", hexapod_set.get(), hexapod_get.get())
+
+        hexapod_set.tear_down()
 
 
 if __name__ == "__main__":

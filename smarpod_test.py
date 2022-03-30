@@ -71,7 +71,8 @@ class SmarPod:
         try:
             self.check_lib_compatibility()
             self.log_controllers()
-
+            
+            logging.info("Try to open the device")
             self.handle = smarpod.Open(self.model, self.locator)
             logging.info("Device opened successfully")
 
