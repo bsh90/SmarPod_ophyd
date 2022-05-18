@@ -1,6 +1,9 @@
 from ophyd import Signal, StatusBase
 import smaract.smarpod as smarpod
 from smarpod_test import SmarPod
+from collections import OrderedDict
+import time
+import datetime
 import logging
 
 
@@ -22,6 +25,41 @@ class SmarSignalRO(Signal):
     def get(self):
         pose = smarpod.GetPose(self.handle)
         return self.smarpod_object.pose_to_double_list(pose)
+
+    def read(self):
+        secondary_orderedDict = OrderedDict()
+        secondary_orderedDict['value'] = self.get()
+        time_now = datetime.datetime.now()
+        secondary_orderedDict['timestamp'] = datetime.datetime.timestamp(time_now)
+        
+        main_orderedDict = OrderedDict()
+        main_orderedDic['channel1'] =  secondary_orderedDict
+        return main_orderedDic
+
+    def describe(self):
+        secondary_orderedDict = OrderedDict()
+        secondary_orderedDict['source'] = 'source'
+        secondary_orderedDict['dtype'] = 'number'
+        secondary_orderedDict['shape'] = []
+        
+        main_orderedDict = OrderedDict()
+        main_orderedDic['channel1'] =  secondary_orderedDict
+        return main_orderedDic
+
+    def read_configuration(self):
+        return OrderedDict()
+
+    def describe_configuration(self):
+        return self.read_configuration()
+
+    def trigger(self):
+        move_status = smarpod.GetMoveStatus(self.handle)
+        status = StatusBase(timeout=60)
+        while (move_status is not smarpod.MoveStatus.STOPPED):
+            time.sleep(10)
+        status.set_finished()
+        status.wait(5)
+        return status
 
 
 class SmarSignal(SmarSignalRO):
@@ -64,3 +102,43 @@ class SmarSignal(SmarSignalRO):
     def verify_reachable_position(self, pose):
         if not self.check_pose(pose):
             raise Exception("Not all poses in sequence are reachable")
+
+
+class SmarSignalDifferentAxis(SmarSignalRO):
+    def set(self, i, i_value):
+        hexapod_get = SmarSignalRO(name="hexapod_get")
+        pose = hexapod_get.get()
+        pose[i] = i_value 
+        hexapod_set = SmarSignal(name="hexapod_set", 
+                                 optional_handle=hexapod_get.handle)
+        return hexapod_set.set(pose)
+
+
+class SmarSignalXPosition(SmarSignalDifferentAxis):
+    def set(self, x, x_value):
+        super().set(0, x_value)
+
+
+class SmarSignalYPosition(SmarSignalDifferentAxis):
+    def set(self, y, y_value):
+        super().set(1, y_value)
+
+
+class SmarSignalZPosition(SmarSignalDifferentAxis):
+    def set(self, z, z_value):
+        super().set(2, z_value)
+
+
+class SmarSignalXRotation(SmarSignalDifferentAxis):
+    def set(self, x, x_value):
+        super().set(3, x_value)
+
+
+class SmarSignalYRotation(SmarSignalDifferentAxis):
+    def set(self, y, y_value):
+        super().set(4, y_value)
+
+
+class SmarSignalZRotation(SmarSignalDifferentAxis):
+    def set(self, z, z_value):
+        super().set(5, z_value)
