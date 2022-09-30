@@ -1,0 +1,9 @@
+root - INFO - controllers found: usb:sn:MCS2-00006657 
+
+root - INFO - Try to open the device
+root - INFO - Device opened successfully
+root - INFO - Frequency for referencing and calibration is set to 8000
+root - INFO - Device has been calibrated.
+root - INFO - Moving stopped. movement status = MoveStatus.STOPPED (0)
+root - INFO - setting coordinate system to 0.0,0.0,0.0,1.5,0.0,0.0
+root - INFO - Device closed successfully
