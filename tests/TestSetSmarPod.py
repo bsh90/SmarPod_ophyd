@@ -1,6 +1,9 @@
+import sys
+sys.path.append('/.../src')
+
 from smaract.smarpod import Pose as Pose
 import smaract.smarpod as smarpod
-from ..SmarPodMain import SmarPod
+from SmarPodMain import SmarPod
 import unittest
 import time
 

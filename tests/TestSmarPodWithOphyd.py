@@ -1,6 +1,9 @@
+import sys
+sys.path.append('/.../src')
+
 from smaract.smarpod import Pose as Pose
-from ..SmarPodMain import SmarPod
-from ..OphydSmarPod import SmarSignalRO, SmarSignal
+from SmarPodMain import SmarPod
+from OphydSmarPod import SmarSignalRO, SmarSignal
 import unittest
 
 
