@@ -1,6 +1,6 @@
 from smaract.smarpod import Pose as Pose
 import smaract.smarpod as smarpod
-from smarpod_main import SmarPod
+from ..SmarPodMain import SmarPod
 import unittest
 
 

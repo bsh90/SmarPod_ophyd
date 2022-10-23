@@ -1,6 +1,6 @@
 from ophyd import Signal, StatusBase
 import smaract.smarpod as smarpod
-from smarpod_test import SmarPod
+from SmarPodMain import SmarPod
 from collections import OrderedDict
 import time
 import datetime

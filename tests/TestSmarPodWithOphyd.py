@@ -1,6 +1,6 @@
 from smaract.smarpod import Pose as Pose
-from smarpod_test import SmarPod
-from ophyd_test import SmarSignalRO, SmarSignal
+from ..SmarPodMain import SmarPod
+from ..OphydSmarPod import SmarSignalRO, SmarSignal
 import unittest
 
 
